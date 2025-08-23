@@ -59,7 +59,7 @@
 @endif
      <!-- Basic Details -->
      <div class="border rounded p-3 mb-4">
-         <h5 class="mb-3">Basic Details</h5>
+         <h5 class="mb-3">Bank Details</h5>
          <!-- Bank ID -->
          <input type="hidden" name="bank_id" value="{{ $user->bank->id ?? '' }}" />
 
@@ -177,11 +177,11 @@
 
      <!-- GST -->
      <div class="border rounded p-3 mb-4">
-         <h5 class="mb-3">GST Number<span style="color:red">*</span></h5>
+         <h5 class="mb-3">GST Amount<span style="color:red">*</span></h5>
          <div class="row">
              <div class="col-lg-4 mb-3">
                  <input {{ $readonly }} {{ $disabled }} type="text" name="gst" value="{{ old('gst', $user->gst ?? '') }}"
-                     class="form-control" required placeholder="Enter GST Number">
+                     class="form-control" required placeholder="Enter GST Amount">
              </div>
          </div>
      </div>

@@ -151,7 +151,7 @@
                             lengthChange: false,
                             searching: false,
                             order: [
-                                [1, 'desc']
+                                [0, 'desc']
                             ], // created_at
                             columns: [{
                                     data: 'srno',

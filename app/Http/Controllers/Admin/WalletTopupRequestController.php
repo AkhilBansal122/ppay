@@ -15,8 +15,10 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Transaction;
 use App\Models\Comission;
 use App\Models\Wallet;
+use App\Models\ServiceCharge;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\RequestLog;
 
 
 class WalletTopupRequestController extends Controller
@@ -91,7 +93,182 @@ class WalletTopupRequestController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function updateWalletRequestStatus(Request $request)
+    public function updateWalletRequestStatus(Request $request) {
+        try{
+
+            $input = $request->all();
+            $walletRequest = WalletRequest::findOrFail($input['id']);
+            $getUsers = User::where('id',$walletRequest->user_id)->first();
+
+            $gst = $getUsers->gst;
+
+
+            $validated = $request->validate([
+                'status' => 'required',
+                'id' => 'required'
+            ]);
+
+            if($input['status'] == 'APPROVED'){
+
+                $validated = $request->validate([
+                        'utr_no' => 'required'
+                    ]);
+
+            }
+            if($input['status'] == 'REVERTED'){
+            $validated = $request->validate([
+                    'remark' => 'required'
+                ]);
+            }
+
+            $response = array();
+            if(!empty($walletRequest)){
+            // dd($walletRequest);
+                if($walletRequest->status == 'PENDING' || $walletRequest->status == 'APPROVED')
+                {
+                    if($input['status'] == 'REVERTED' && $walletRequest->status == 'APPROVED')
+                    {
+                        $walletRequest->remark = $input['remark'];
+                        $walletRequest->status = $input['status'];
+                        $walletRequest->save();
+                        $wallet = Wallet::where('user_id', $walletRequest->user_id)->first();
+                        ServiceCharge::where("ref_id", $walletRequest->id)->update(['is_charged' => 0]);
+
+                        $tx = new Transaction();
+                        if(!empty($wallet)){
+                            $tx->wallet_id = $wallet->id;
+                            $tx->last_balance = $wallet->amount;
+                            $wallet->is_approved = 1;
+                            $wallet->save();
+                            //$wallet->amoun
+                            (new CommonController)->updateWallet('SUB', $walletRequest->payin_amount, $wallet->id);
+
+                        }
+
+                        // Create tx
+                        $tx->user_id = $walletRequest->user_id;
+                        //                    $tx->debit_amount = $walletRequest->payin_amount;
+                        $tx->amount = $walletRequest->amount;
+                        $tx->type = 'REVERTWALLETLOAD';
+                        $tx->initiator_id = $walletRequest->utr_no;
+                        $tx->balance = $wallet->amount - $walletRequest->payin_amount;
+                        $tx->status = 'success';
+                        $tx->remark = 'Reverted Wallet Load';
+                        $tx->save();
+                        (new CommonController)->removeServiceChargeFromWalletLoad($walletRequest);
+                        $response['status'] = true;
+                        $response['message'] = 'Request Revert updated successfully';
+                        $walletRequest->save();
+                         echo json_encode($response);
+
+                    }else if($input['status'] == 'APPROVED' && $walletRequest->status == 'PENDING'){
+
+                        $walletRequest->is_updated =true;
+                        $walletRequest->save();
+                        $walletRequest->utr_no = $input['utr_no'];
+                        $walletRequest->status = $input['status'];
+                        $datas=$this->getComissionNew($getUsers,$walletRequest->user_id,$walletRequest->amount);
+                        $walletRequest->platform_charge =$datas['charges'];//chargs;
+                        $walletRequest->gst = $datas['gst'];
+
+                        // $walletRequest->payin_amount = $walletRequest->amount - ($walletRequest->platform_charge);
+                        $walletRequest->payin_amount = $walletRequest->amount - ($walletRequest->platform_charge +  $walletRequest->gst); //payin platform fees + GST amount
+                        $walletRequest->save();
+
+                        $wallet = Wallet::where('user_id', $walletRequest->user_id)->first();
+                        $tx = new Transaction();
+                        $wallet->is_approved=1;
+                        $last_amount = $wallet->amount;
+                        $wallet->amount = $wallet->amount + $walletRequest->payin_amount; //Add in wallet table
+                        $wallet->save();
+                        if(!empty($wallet)){
+                            $tx->last_balance = $last_amount;
+                            $tx->wallet_id = $wallet->id;
+                        }
+
+                        // Create tx
+                        $tx->user_id = $walletRequest->user_id;
+                        // $tx->credit_amount = $walletRequest->payin_amount;
+                        $tx->amount = $walletRequest->amount;
+                        $tx->type = 'WALLETLOAD';
+                        $tx->initiator_id = $walletRequest->utr_no;
+                        $tx->balance = $wallet->amount;
+                        $tx->status = 'success';
+                        $tx->remark = 'Wallet Load';
+                        $tx->save();
+
+                        (new CommonController)->createServiceChargeFromWalletLoad($walletRequest,$tx);
+                        $walletRequest->save();
+                        $response['status'] = true;
+                        $response['message'] = 'Request updated successfully';
+                        echo json_encode($response);
+
+                    }
+                    else if($input['status'] == 'DECLINED' && $walletRequest->status == 'PENDING')
+                    {
+                        $walletRequest->status = $input['status'];
+                        $walletRequest->save();
+
+                        $response['status'] = true;
+                        $response['message'] = 'Request updated successfully';
+                        $walletRequest->save();
+                        echo json_encode($response);
+                    }
+                }
+            }else{
+                $response['status'] = false;
+                $response['message'] = 'Request Not Found!';
+
+                echo json_encode($response);
+            }
+
+        }catch (\Exception $e) {
+            dd($e);
+            DB::rollBack();
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+}
+    private function getComissionNew($getUsers,$user_id,$amount){
+                    $api_status = $getUsers->api_status;
+                    $charges= 0;
+                    $total_charges=0;
+
+                    $gst = (float)$getUsers->gst;   // e.g. 5
+                    $amount = (float)$amount;       // e.g. 1000
+                    //
+                    $gstAmount = ($amount * $gst) / 100;   // GST value in %
+
+
+                    /// pay In Commision alway in %
+                $comission = Comission::where('user_id',$user_id) ->where('type','PAYIN')->first();
+                 if ($comission) {
+                    // Determine percentage based on ranges
+                    if ($amount <= $comission->commission1) {
+
+                        $percentage = $comission->percentage1;
+                        $charges = ($amount * $percentage) / 100;
+                        $total_charges = $charges+$gstAmount;
+
+                    } elseif ($amount > $comission->commission1 && $amount <= $comission->commission2) {
+                        $percentage = $comission->percentage2;
+                        $charges = ($amount * $percentage) / 100;
+                        $total_charges = $charges+$gstAmount;
+
+                    } elseif ($amount > $comission->commission2 && $amount <= $comission->commission3) {
+                        $percentage = $comission->percentage3;
+                        $charges = ($amount * $percentage) / 100;
+                        $total_charges = $charges+$gstAmount;
+                    }
+
+                }
+            return [
+                'gst'           => $gstAmount,
+                'total_charges' => $total_charges,
+                'charges'       => $charges,
+                'amount'        => $amount,
+            ];
+    }
+    public function updateWalletRequestStatus1(Request $request)
     {
         try{
 
@@ -126,7 +303,7 @@ class WalletTopupRequestController extends Controller
                     $walletRequest->is_updated =true;
 
                     $walletRequest->save();
-                //    dd($walletRequest);
+                     //    dd($walletRequest);
                     $walletRequest->utr_no = $input['utr_no'];
                     $walletRequest->status = $input['status'];
 
@@ -179,7 +356,7 @@ class WalletTopupRequestController extends Controller
 
                     // Create tx
                     $tx->user_id = $walletRequest->user_id;
-//                    $tx->debit_amount = $walletRequest->payin_amount;
+                    //                    $tx->debit_amount = $walletRequest->payin_amount;
                     $tx->amount = $walletRequest->amount;
                     $tx->type = 'REVERTWALLETLOAD';
                     $tx->initiator_id = $walletRequest->utr_no;
@@ -298,7 +475,7 @@ class WalletTopupRequestController extends Controller
                 $revert ="'REVERTED'";
                 $retry ="'RETRY'";
                 $minutes = round(abs($current_time - strtotime($value->created_at)) / 60,2);
-                if($value->source == 'METASPAY'){
+                if($value->source == 'PPAY'){
                     if($value->status == 'PENDING'){
                         $data['action'] = '
                                         <div style="display: table-caption;">

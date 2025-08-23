@@ -11,6 +11,7 @@ use App\Models\WalletRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\Wallet;
+use App\Models\RequestLog;
 class WalletTopupController extends Controller
 {
        public function __construct()
@@ -100,8 +101,19 @@ class WalletTopupController extends Controller
         $walletRequest->remark = $input['remark'];
         $walletRequest->requested_user_id =  Auth::id();
         $walletRequest->status = 'PENDING';
-        $walletRequest->source = 'METASPAY';
+        $walletRequest->source = 'PPAY';
         $walletRequest->save();
+
+
+        RequestLog::create([
+    'type'       => 'wallet_load_request',
+    'user_agent' => $request->header('User-Agent'),
+    'ip'         => $request->getClientIp(),
+    'end_point'  => $request->path(),
+    'data'       => json_encode($request->all()),
+]);
+
+
         return redirect()->route('wallet-topup-request.index')->with('success', 'Great! Wallet Request has been saved successfully!');
     }
 

@@ -147,7 +147,7 @@ class CommonController extends Controller
             }else if ($action == 'SUB'){
                 DB::beginTransaction();
                 try {
-                    DB::statement('UPDATE wallets set is_approved =1, amount = amount - '.$amount.' where id ='.$id.'');
+                    DB::statement('UPDATE wallets set  amount = amount - '.$amount.' where id ='.$id.'');
                     DB::commit();
                     // all good
                 } catch (\Exception $e) {
@@ -444,13 +444,13 @@ class CommonController extends Controller
             $serviceCharge->gst = $wr->gst;
             $serviceCharge->amount = $wr->amount;
             $serviceCharge->charge = $wr->platform_charge;
-            // $serviceCharge->total_charge = ($wr->platform_charge + $wr->gst);
-            $serviceCharge->total_charge =$wr->payin_amount;
+            $serviceCharge->total_charge = ($wr->platform_charge + $wr->gst);
+            //$serviceCharge->total_charge =$wr->payin_amount;
             $serviceCharge->type = 'PAYIN';
             $serviceCharge->ref_id = $wr->id;
             $serviceCharge->ref_type = "WALLET_REQUEST";
                         $serviceCharge->is_charged  = 1;
-            // if($wr->source == 'METASPAY'){
+            // if($wr->source == 'PPAY'){
             //     // $serviceCharge->api_provider = 'EKO';
             // }else{
             //     // $serviceCharge->api_provider = $wr->source;
