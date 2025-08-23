@@ -28,7 +28,7 @@ class WalletTopupRequestController extends Controller
         $this->columns = [
             "id",
             'user_id',
-            'requested_user_id ',
+            'requested_user_id',
             'amount',
             'remark',
             'status',

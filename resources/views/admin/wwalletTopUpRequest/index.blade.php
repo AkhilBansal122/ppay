@@ -151,7 +151,7 @@
                             lengthChange: false,
                             searching: false,
                             order: [
-                                [5, 'desc']
+                                [1, 'desc']
                             ], // created_at
                             columns: [{
                                     data: 'srno',
@@ -160,10 +160,12 @@
                                 },
                                 {
                                     data: 'name',
+                                      orderable: false,
                                     name: 'name'
                                 },
                                 {
                                     data: 'amount',
+                                    searchable: false,
                                     name: 'amount'
                                 },
                                 {
@@ -178,6 +180,7 @@
 
                                 {
                                     data: 'requested_by',
+                                     searchable: false,
                                     name: 'requested_by'
                                 },
                                 {

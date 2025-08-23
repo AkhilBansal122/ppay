@@ -105,7 +105,6 @@ class PayInController extends Controller
             $banners = $records->offset($request->start)->limit(count($total))->get();
         }
         $result = [];
-
         $i = 1;
         foreach ($banners as $value) {
             $data = [];

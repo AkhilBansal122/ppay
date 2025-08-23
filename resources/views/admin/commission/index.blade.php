@@ -134,7 +134,7 @@
                             lengthChange: false,
                             searching: false,
                             order: [
-                                [1, 'desc']
+                                [0, 'desc']
                             ], // 👈 default order (2nd column = transfer_by)
                             columns: [{
                                     data: 'srno',

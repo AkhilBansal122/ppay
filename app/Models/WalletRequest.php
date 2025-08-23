@@ -9,7 +9,7 @@ use App\Models\User;
 class WalletRequest extends Model
 {
     use HasFactory;
-
+    protected $guarded =[];
     public function userId(){
         return $this->belongsTo(User::class, 'user_id');
     }
