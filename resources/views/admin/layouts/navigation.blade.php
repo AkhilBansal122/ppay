@@ -145,11 +145,8 @@
                         </a>
                     </li>
                 @endcan
-                @can('service-charges')
-
-                @endcan
                      @can('service-charges')
-                    <li
+                    <li style="display: none"
                         class="nxl-item nxl-hasmenu nxl-trigger
         {{ request()->is('service-charge*') || request()->is('service-charges/*') ? 'active' : '' }}">
                         <a href="javascript:void(0);" class="nxl-link">

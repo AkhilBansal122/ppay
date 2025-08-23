@@ -38,45 +38,9 @@
                         <div class="card-body lead-status">
                             <form action="{{ route('users.update', $user->id) }}" id="permissionForm" method="POST">
                                 @csrf
+                                <input type="hidden" name="user_id" value="{{ $user->id ?? '' }}" />
                                 @method('PUT') <!-- Add this if you are using PUT/PATCH for update -->
-
-                                <div class="row">
-                                    <div class="col-lg-4 mb-4">
-                                        <label class="form-label">Username <span style="color:red">*</span></label>
-                                        <input type="text" name="name" required value="{{ old('name', $user->name) }}" placeholder="Please enter a username" class="form-control" />
-                                    </div>
-                                    <div class="col-lg-4 mb-4">
-                                        <label class="form-label">First Name <span style="color:red">*</span></label>
-                                        <input type="text" name="first_name" required value="{{ old('first_name', $user->first_name) }}" placeholder="Please enter a first name" class="form-control" />
-                                    </div>
-                                    <div class="col-lg-4 mb-4">
-                                        <label class="form-label">Last Name <span style="color:red">*</span></label>
-                                        <input type="text" name="last_name" required value="{{ old('last_name', $user->last_name) }}" placeholder="Please enter a last name" class="form-control" />
-                                    </div>
-                                    <div class="col-lg-4 mb-4">
-                                        <label class="form-label">Email <span style="color:red">*</span></label>
-                                        <input type="email" name="email" required value="{{ old('email', $user->email) }}" placeholder="Please enter an email" class="form-control" />
-                                    </div>
-                                    <div class="col-lg-4 mb-4">
-                                        <label class="form-label">Phone No <span style="color:red">*</span></label>
-                                        <input type="text" name="phone_no" required value="{{ old('phone_no', $user->phone_no) }}" placeholder="Please enter a phone number" class="form-control" pattern="\d{10}" title="Please enter a 10-digit phone number" />
-                                    </div>
-                                    <div class="col-lg-4 mb-4">
-                                        <label class="form-label">Password </label>
-                                        <input type="password" name="password"
-                                        placeholder="Please enter a password" class="form-control" />
-                                    </div>
-                                    <div class="col-lg-4 mb-4">
-                                        <label class="form-label">Confirm Password </label>
-                                        <input type="password" name="password_confirmation" placeholder="Please confirm your password" class="form-control" />
-                                    </div>
-                                    <input type="hidden" name="role_id" required value="{{ old('role_id', $user->role_id) }}"
-                                     />
-
-                                </div>
-
-
-
+                                @include('admin.customers.form',compact('user'))
                                 <div class="row mt-4">
                                     <div class="col-lg-4 mb-4 d-flex justify-content-start">
                                         <a href="{{ route('users.index') }}" class="btn btn-secondary">

@@ -97,6 +97,9 @@
                 pageLength: 5,
                 lengthChange: false,
                 searching: true,
+                order: [
+                                [0, 'desc']
+                            ],
                 columns: [
                     { data: 'srno', name: 'id' ,orderable: false, searchable: false},
                     { data: 'first_name', name: 'first_name' },

@@ -122,6 +122,13 @@ function sendMail($email, $template, $data)
     }
 }
 
+if (!function_exists('updateOrCreateModel')) {
+
+function updateOrCreateModel($modelClass, array $match, array $data)
+{
+    return $modelClass::updateOrCreate($match, $data);
+}
+}
 if (!function_exists('dateFormat')) {
 
 function dateFormat($date){
@@ -132,13 +139,21 @@ if (!function_exists('actions')) {
     function actions($data) {
         $action = '<div class="hstack gap-2 justify-content-end">';
 
-        if (!empty($data['edit'])) {
+       if (!empty($data['edit'])) {
 
             $action .= '<a href="' . $data['edit'].'" class="avatar-text avatar-md">
+                <i class="feather feather-edit"></i>
+            </a>';
+        }
+
+                if (!empty($data['view'])) {
+
+            $action .= '<a href="' . $data['view'].'" class="avatar-text avatar-md">
                 <i class="feather feather-eye"></i>
             </a>';
         }
-         if (!empty($data['view']) || !empty($data['delete'])) {
+
+        if ( !empty($data['delete'])) {
             $action .= '<div class="dropdown">
                 <a href="javascript:void(0)" class="avatar-text avatar-md" data-bs-toggle="dropdown" data-bs-offset="0,21">
                     <i class="feather feather-more-horizontal"></i>
@@ -155,6 +170,15 @@ if (!function_exists('actions')) {
                 </li>';
             }
 
+             if (!empty($data['edit'])) {
+                $viewUrl = $data['edit'];
+                $action .= '<li>
+                    <a class="dropdown-item" href="' . $viewUrl . '">
+                        <i class="feather feather-edit-3 me-3"></i>
+                        <span>View</span>
+                    </a>
+                </li>';
+            }
             if (isset($data['delete'])) {
                 $editUrl = $data['delete'];
                 $action .= '<li>
@@ -165,47 +189,47 @@ if (!function_exists('actions')) {
                 </li>';
             }
 
-            $action .= '<li>
-                <a class="dropdown-item printBTN" href="javascript:void(0)">
-                    <i class="feather feather-printer me-3"></i>
-                    <span>Print</span>
-                </a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="feather feather-clock me-3"></i>
-                    <span>Remind</span>
-                </a>
-            </li>
-            <li class="dropdown-divider"></li>';
+            // $action .= '<li>
+            //     <a class="dropdown-item printBTN" href="javascript:void(0)">
+            //         <i class="feather feather-printer me-3"></i>
+            //         <span>Print</span>
+            //     </a>
+            // </li>
+            // <li>
+            //     <a class="dropdown-item" href="javascript:void(0)">
+            //         <i class="feather feather-clock me-3"></i>
+            //         <span>Remind</span>
+            //     </a>
+            // </li>
+            // <li class="dropdown-divider"></li>';
 
-            if (isset($data['archive'])) {
-                $action .= '<li>
-                    <a class="dropdown-item" href="javascript:void(0)">
-                        <i class="feather feather-archive me-3"></i>
-                        <span>Archive</span>
-                    </a>
-                </li>';
-            }
+            // if (isset($data['archive'])) {
+            //     $action .= '<li>
+            //         <a class="dropdown-item" href="javascript:void(0)">
+            //             <i class="feather feather-archive me-3"></i>
+            //             <span>Archive</span>
+            //         </a>
+            //     </li>';
+            // }
 
-            if (isset($data['report_spam'])) {
-                $action .= '<li>
-                    <a class="dropdown-item" href="javascript:void(0)">
-                        <i class="feather feather-alert-octagon me-3"></i>
-                        <span>Report Spam</span>
-                    </a>
-                </li>';
-            }
+            // if (isset($data['report_spam'])) {
+            //     $action .= '<li>
+            //         <a class="dropdown-item" href="javascript:void(0)">
+            //             <i class="feather feather-alert-octagon me-3"></i>
+            //             <span>Report Spam</span>
+            //         </a>
+            //     </li>';
+            // }
 
-            if (isset($data['delete'])) {
-                $action .= '<li class="dropdown-divider"></li>
-                <li>
-                    <a class="dropdown-item" href="javascript:void(0)">
-                        <i class="feather feather-trash-2 me-3"></i>
-                        <span>Delete</span>
-                    </a>
-                </li>';
-            }
+            // if (isset($data['delete'])) {
+            //     $action .= '<li class="dropdown-divider"></li>
+            //     <li>
+            //         <a class="dropdown-item" href="javascript:void(0)">
+            //             <i class="feather feather-trash-2 me-3"></i>
+            //             <span>Delete</span>
+            //         </a>
+            //     </li>';
+            // }
 
             $action .= '</ul>
             </div>';

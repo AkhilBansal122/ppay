@@ -7,10 +7,10 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use  App\Models\User;
 use  App\Models\Comission;
-
+use App\Models\UserBank;
 use Illuminate\Support\Arr;
 use DB;
-
+use Auth;
 class CustomerController extends Controller
 {
     /**
@@ -51,18 +51,25 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+            DB::beginTransaction(); // Start the transaction
+
         try {
+            $adminId = Auth::id();
+
             // Validate the request
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email',
+                'bank_email' => 'required|email|max:255',
+                'bank_mobile' =>'required|numeric|digits:10',
                 'phone_no' => 'required|numeric|digits:10', // Ensures only numeric characters are allowed
                 'password' => 'required|string|min:8|confirmed', // 'confirmed' handles password confirmation
                 'password.confirmed' => 'The password confirmation does not match.',
+                'bank_password'=> 'required|string|min:8', // 'confirmed' handles password confirmation
                 'role_id' => 'required',
-                'ip_address' => 'nullable|ip',
+                'ip_address' => 'required',
                 'max_transfer_amount' => 'required|numeric',
                 'api_provider' => 'required|string',
                 'max_tps' => 'nullable|numeric',
@@ -83,22 +90,35 @@ class CustomerController extends Controller
                 'api_status' => 'nullable|boolean',
                 'payout_commission_in_percent' => 'nullable|boolean',
                 'bank_name' => 'required|string|max:255',
-                'account_number' => 'required|string|unique:users,account_number',
-                'ifsc_code' => 'required|string|max:20',
+               // 'account_number' => 'required|string|unique:users,account_number',
+             //   'ifsc_code' => 'required|string|max:20',
                 'branch_name' => 'nullable|string|max:255',
             ]);
 
-            // Hash the password
-
             $validated['password'] = Hash::make($validated['password']);
-            $validated['status'] = $request->has('status') ? 1 : 0;
-            $validated['api_status'] = $request->has('api_status') ? 1 : 0;
-            $validated['payout_commission_in_percent'] = $request->has('payout_commission_in_percent') ? 1 : 0;
+            $validated['status'] = $request->status ? 1 : 0;
+                        $validated['gst'] = $request->gst ?? 0;
+
+            $validated['api_status'] = $request->api_status ? 1 : 0;
+            $validated['payout_commission_in_percent'] = $request->payout_commission_in_percent ? 1 : 0;
             $validated['node_bypass'] = $request->has('node_bypass') ? 1 : 0;
 
-            unset($validated['roles']);
-            // Create a new user
-           $user= User::create($validated);
+                // Create a new user
+                $user = User::create([
+                    'name'       => $request->name,
+                    'first_name' => $request->first_name,
+                    'last_name'  => $request->last_name,
+                    'email'      => $request->email,
+                    'phone_no'   => $request->phone_no,
+                    'gst'=>$request->gst,
+                    'status'=>$request->status ? 1:0,
+                    'api_status'=>$request->api_status ? 1:0,
+                    'payout_commission_in_percent'=>$request->payout_commission_in_percent ? 1:0,
+
+                    'password'   => Hash::make($validated['password']),
+                ]);
+
+            $userId = $user->id;
 
 
            $roles = Role::where("id",$request->role_id)->first();
@@ -106,12 +126,57 @@ class CustomerController extends Controller
            // Assign roles
            $user->assignRole($roles->name);
 
+            updateOrCreateModel(\App\Models\UserBank::class,
+    ['user_id' => $userId],
+    [
+        'admin_id'       => $adminId,
+        'bank_name'      => $request->bank_name,
+        // 'account_number' => $request->account_number,
+       'ip_address'      => $request->ip_address,
+       'api_provider'    => $request->api_provider,
+       'max_transfer_amount' =>$request->max_transfer_amount,
+       'max_tps'=>$request->max_tps,
+        'email'     =>$request->bank_email,
+        'bank_mobile'=>$request->bank_mobile,
+        'password'       => Hash::make($validated['bank_password']),
+    ]
+);
+
+updateOrCreateModel(\App\Models\Comission::class,
+    ['user_id' => $userId, 'type' => 'payin'],
+    [
+        'admin_id'    => $adminId,
+        'commission1' => $request->payin_commission1,
+        'percentage1' => $request->payin_percentage1,
+        'commission2' => $request->payin_commission2,
+        'percentage2' => $request->payin_percentage2,
+        'commission3' => $request->payin_commission3,
+        'percentage3' => $request->payin_percentage3,
+    ]
+);
+
+updateOrCreateModel(\App\Models\Comission::class,
+    ['user_id' => $userId, 'type' => 'payout'],
+    [
+        'admin_id'    => $adminId,
+        'commission1' => $request->payout_commission1,
+        'percentage1' => $request->payout_percentage1,
+        'commission2' => $request->payout_commission2,
+        'percentage2' => $request->payout_percentage2,
+        'commission3' => $request->payout_commission3,
+        'percentage3' => $request->payout_percentage3,
+    ]
+);
+        DB::commit(); // Everything went well — commit the transaction
+
 
             // Redirect back with success message
             return redirect()->back()->with('success', 'Customer created successfully!');
 
         } catch (\Exception $e) {
             // Redirect back with a generic error message
+                   DB::rollBack(); // Something failed — rollback everything
+            dd($e->getMessage());
             return redirect()->back()->withInput()->withErrors(['error' =>$e->getMessage()]);
         }
     }
@@ -121,7 +186,14 @@ class CustomerController extends Controller
      */
     public function show(string $id)
     {
-        //
+            $user = User::with(['bank','payinCommission','payoutCommission'])->findOrFail($id);
+
+        $roles = Role::where("id","<>",1)->pluck('name','name')->all();
+        $userRole = $user->roles->pluck('name','name')->all();
+        $user->role_id =$user->roles->pluck('id')[0];
+        $view = true;
+        return view('admin.customers.show',compact('user','roles','userRole','view'));
+
     }
 
     /**
@@ -129,7 +201,7 @@ class CustomerController extends Controller
      */
     public function edit(string $id)
     {
-        $user = User::find($id);
+            $user = User::with(['bank','payinCommission','payoutCommission'])->findOrFail($id);
 
         $roles = Role::where("id","<>",1)->pluck('name','name')->all();
         $userRole = $user->roles->pluck('name','name')->all();
@@ -143,8 +215,13 @@ class CustomerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-
+            $adminId = Auth::id();
+            $userId = $id;
+            $user = User::with(['bank','payinCommission','payoutCommission'])->findOrFail($id);
+            DB::beginTransaction(); // Start the transaction
         try {
+        $input = $request->all();
+
             // Validate the request
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
@@ -152,33 +229,124 @@ class CustomerController extends Controller
                 'last_name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email,'.$id,
                 'phone_no' => 'required|numeric|digits:10', // Ensures only numeric characters are allowed
-                'password.confirmed' => 'The password confirmation does not match.',
                 'role_id' => 'required',
+                  'bank_email' => 'required|email|max:255',
+                'bank_mobile' =>'required|numeric|digits:10',
+                'phone_no' => 'required|numeric|digits:10', // Ensures only numeric characters are allowed
+                'role_id' => 'required',
+                'ip_address' => 'required',
+                'max_transfer_amount' => 'required|numeric',
+                'api_provider' => 'required|string',
+                'max_tps' => 'nullable|numeric',
+                'payin_commission1' => 'nullable|numeric',
+                'payin_percentage1' => 'nullable|numeric',
+                'payin_commission2' => 'nullable|numeric',
+                'payin_percentage2' => 'nullable|numeric',
+                'payin_commission3' => 'nullable|numeric',
+                'payin_percentage3' => 'nullable|numeric',
+                'payout_commission1' => 'nullable|numeric',
+                'payout_percentage1' => 'nullable|numeric',
+                'payout_commission2' => 'nullable|numeric',
+                'payout_percentage2' => 'nullable|numeric',
+                'payout_commission3' => 'nullable|numeric',
+                'payout_percentage3' => 'nullable|numeric',
+                'gst' => 'nullable|string|max:255',
+                'status' => 'nullable|boolean',
+                'api_status' => 'nullable|boolean',
+                'payout_commission_in_percent' => 'nullable|boolean',
+                'bank_name' => 'required|string|max:255',
+               // 'account_number' => 'required|string|unique:users,account_number',
+             //   'ifsc_code' => 'required|string|max:20',
+                'branch_name' => 'nullable|string|max:255',
+
             ]);
 
                 if ($request->filled('password')) {
                     $rules['password'] = 'required|string|min:8|confirmed';
-
-    }
+                }
+                if ($request->filled('bank_password')) {
+                    $rules['bank_password'] = 'required|string|min:8';
+                }
             // Hash the password
-            $input = $request->all();
-            if(!empty($input['password'])){
-                $input['password'] = Hash::make($input['password']);
-            }else{
-                $input = Arr::except($input,array('password'));
-            }
+                if (!empty(trim($input['password'] ?? ''))) {
+                    $user->password = Hash::make($input['password']);
+                }
+                            // Assume $user is already fetched (e.g., $user = User::find($id);)
 
-            // $user = User::find($id);
-            // $user->update($input);
-            // DB::table('model_has_roles')->where('model_id',$id)->delete();
+                $user->name        = $request->name;
+                $user->first_name  = $request->first_name;
+                $user->last_name   = $request->last_name;
+                $user->email       = $request->email;
+                $user->phone_no    = $request->phone_no;
+                $user->gst         = $request->gst;
+
+                $user->status                      = $request->has('status') ? 1 : 0;
+                $user->api_status                 = $request->has('api_status') ? 1 : 0;
+                $user->payout_commission_in_percent = $request->has('payout_commission_in_percent') ? 1 : 0;
+
+                $user->save();
+
+                $data = [
+                    'admin_id'            => $adminId,
+                    'bank_name'           => $request->bank_name,
+                    'ip_address'          => $request->ip_address,
+                    'api_provider'        => $request->api_provider,
+                    'max_transfer_amount' => $request->max_transfer_amount,
+                    'max_tps'             => $request->max_tps,
+                    'email'               => $request->bank_email,
+                    'bank_mobile'         => $request->bank_mobile,
+                ];
+
+                if (!empty($request->bank_password)) {
+                    $data['password'] = Hash::make($request->bank_password);
+                }
+
+               // dd($data);
+                if ($user->bank) {
+                    $user->bank()->update($data);
+                } else {
+                    $user->bank()->create($data); // associate new bank record
+                }
 
 
-            // Assign roles
-            // $user->assignRole($request->role_id);
-            // Redirect back with success message
+
+
+updateOrCreateModel(\App\Models\Comission::class,
+                ['user_id' => $userId, 'type' => 'payin','id'=>$request->payin_commission_id],
+                [
+                    'admin_id'    => $adminId,
+                    'commission1' => $request->payin_commission1,
+                    'percentage1' => $request->payin_percentage1,
+                    'commission2' => $request->payin_commission2,
+                    'percentage2' => $request->payin_percentage2,
+                    'commission3' => $request->payin_commission3,
+                    'percentage3' => $request->payin_percentage3,
+                ]
+
+);
+
+
+updateOrCreateModel(\App\Models\Comission::class,
+    ['user_id' => $userId, 'type' => 'payout','id'=>$request->payout_commission_id],
+    [
+        'admin_id'    => $adminId,
+        'commission1' => $request->payout_commission1,
+        'percentage1' => $request->payout_percentage1,
+        'commission2' => $request->payout_commission2,
+        'percentage2' => $request->payout_percentage2,
+        'commission3' => $request->payout_commission3,
+        'percentage3' => $request->payout_percentage3,
+    ]
+);
+        DB::commit(); // Everything went well — commit the transaction
+
+               //   dd($input);
+
             return redirect()->back()->with('success', 'User updated successfully!');
 
         } catch (\Exception $e) {
+                              DB::rollBack(); // Something failed — rollback everything
+
             // Redirect back with a generic error message
             return redirect()->back()->withInput()->withErrors(['error' => $e->getMessage()]);
         }
@@ -224,7 +392,7 @@ class CustomerController extends Controller
             $data['created_at'] = dateFormat($value->created_at); // Assuming created_at is a Carbon instance
             $action = actions([
                 'edit' => route('users.edit', $value->id),
-                'view' => '',   // You may consider removing this if it's not used
+                'view' => route('users.show', $value->id),   // You may consider removing this if it's not used
                 'delete' => ''  // You may consider removing this if it's not used
             ]);
 

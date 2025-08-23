@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use  App\Models\Comission;
+use App\Models\UserBank;
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
@@ -15,19 +18,9 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'first_name',
-        'last_name',
-        'email',
-        'password',
-        'phone_no',
-        'dob',
-        'gender',
-        'status'
-    ];
+    protected $guarded =[];
+    protected $table ='users';
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -51,6 +44,29 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Add inside App\Models\User
+        public function bank()
+        {
+            return $this->hasOne(UserBank::class, 'user_id', 'id');
+        }
+
+        public function commissions()
+        {
+            return $this->hasMany(Comission::class, 'user_id', 'id');
+        }
+
+        public function payinCommission()
+        {
+            return $this->hasOne(Comission::class, 'user_id', 'id')->where('type', 'payin');
+        }
+
+public function payoutCommission()
+{
+    return $this->hasOne(Comission::class, 'user_id', 'id')->where('type', 'payout');
+}
+
+
 
     public function fetchCustomerData($request, $columns) {
         $query =User::where('id', '!=', '');
