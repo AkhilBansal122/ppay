@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use  App\Models\User;
+use  App\Models\Comission;
+
 use Illuminate\Support\Arr;
 use DB;
 
@@ -60,13 +62,44 @@ class CustomerController extends Controller
                 'password' => 'required|string|min:8|confirmed', // 'confirmed' handles password confirmation
                 'password.confirmed' => 'The password confirmation does not match.',
                 'role_id' => 'required',
+                'ip_address' => 'nullable|ip',
+                'max_transfer_amount' => 'required|numeric',
+                'api_provider' => 'required|string',
+                'max_tps' => 'nullable|numeric',
+                'payin_commission1' => 'nullable|numeric',
+                'payin_percentage1' => 'nullable|numeric',
+                'payin_commission2' => 'nullable|numeric',
+                'payin_percentage2' => 'nullable|numeric',
+                'payin_commission3' => 'nullable|numeric',
+                'payin_percentage3' => 'nullable|numeric',
+                'payout_commission1' => 'nullable|numeric',
+                'payout_percentage1' => 'nullable|numeric',
+                'payout_commission2' => 'nullable|numeric',
+                'payout_percentage2' => 'nullable|numeric',
+                'payout_commission3' => 'nullable|numeric',
+                'payout_percentage3' => 'nullable|numeric',
+                'gst' => 'nullable|string|max:255',
+                'status' => 'nullable|boolean',
+                'api_status' => 'nullable|boolean',
+                'payout_commission_in_percent' => 'nullable|boolean',
+                'bank_name' => 'required|string|max:255',
+                'account_number' => 'required|string|unique:users,account_number',
+                'ifsc_code' => 'required|string|max:20',
+                'branch_name' => 'nullable|string|max:255',
             ]);
 
             // Hash the password
+
             $validated['password'] = Hash::make($validated['password']);
+            $validated['status'] = $request->has('status') ? 1 : 0;
+            $validated['api_status'] = $request->has('api_status') ? 1 : 0;
+            $validated['payout_commission_in_percent'] = $request->has('payout_commission_in_percent') ? 1 : 0;
+            $validated['node_bypass'] = $request->has('node_bypass') ? 1 : 0;
+
             unset($validated['roles']);
             // Create a new user
            $user= User::create($validated);
+
 
            $roles = Role::where("id",$request->role_id)->first();
 
