@@ -165,7 +165,7 @@ public function store(Request $request)
                     'description'   => 'Payout request created',
                 ]);
 
-                $transactionId = "PP{$orderId}" . strtoupper(date('M')) . $transaction->id;
+                $transactionId =$orderId;// "PP{$orderId}" . strtoupper(date('M')) . $transaction->id;
                 $transaction->update(['transaction_id' => $transactionId,'upload_type'=>2]);
 
                 RequestLog::create([

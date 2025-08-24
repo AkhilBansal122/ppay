@@ -176,7 +176,7 @@ if (isset($response['status']) && $response['status'] === true) {
     $monthShort = strtoupper(date('M')); // aug, sep, etc.
     $lastId = $transaction->id; // ID of the record just inserted
 
-    $transactionId = "PP{$orderId}{$monthShort}{$lastId}";
+    $transactionId =$orderId;// "PP{$orderId}{$monthShort}{$lastId}";
 
     // 4. Update transaction with transaction_id
 Transaction::where('id', $lastId)->update([

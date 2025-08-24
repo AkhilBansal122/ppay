@@ -86,10 +86,12 @@
                                                 <th>User Name</th>
                                                 <th>Amount</th>
                                                 <th>Remark</th>
-                                                <th>Status</th>
+                                                <th>platform_charge</th>
+                                                <th>gst</th>
                                                 <th>Requested By</th>
+                                                <th>Status</th>
+
                                                 <th>Created Date</th>
-                                                <th>Updated Date</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -173,8 +175,12 @@
                                     name: 'remark'
                                 },
                                 {
-                                    data: 'status',
-                                    name: 'status'
+                                    data: 'platform_charge',
+                                    name: 'platform_charge'
+                                },
+                                {
+                                    data: 'gst',
+                                    name: 'gst'
                                 },
 
 
@@ -184,13 +190,15 @@
                                     name: 'requested_by'
                                 },
                                 {
+                                    data: 'status',
+                                    name: 'status'
+                                },
+
+                                {
                                     data: 'created_at',
                                     name: 'created_at'
                                 },
-                                {
-                                    data: 'updated_at',
-                                    name: 'updated_at'
-                                },
+
                                 {
                                     data: 'action',
                                     name: 'action'

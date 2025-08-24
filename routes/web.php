@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\LedgerController;
 use App\Http\Controllers\Admin\WalletTopupController;
 use App\Http\Controllers\Admin\WalletTopupRequestController;
 use App\Http\Controllers\Admin\ServiceChargeController;
+use App\Http\Controllers\Admin\LogController;
+
 
 use App\Http\Controllers\CommonController;
 
@@ -93,7 +95,13 @@ Route::get('/api', function () {
 
 
             Route::get('commission', [CommonController::class, 'index'])->name('commission.index');
-    Route::post('commission/data', [CommonController::class, 'getData'])->name('commission.data');
+            Route::post('commission/data', [CommonController::class, 'getData'])->name('commission.data');
+
+    Route::get('log', [LogController::class, 'index'])->name('admin.log');
+        Route::post('log/data', [LogController::class, 'getData'])->name('log.data');
+        Route::post('log/export', [LogController::class, 'export'])->name('log.export');
+
+
 
 });
 

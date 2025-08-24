@@ -16,5 +16,22 @@ class RequestLog extends Model
 
     ];
 
+   public static function fetchData($request, $columns) {
+
+        $query =RequestLog::where('id', '!=', '');
+
+        if (isset($request->from_date)) {
+            $query->whereRaw('DATE_FORMAT(created_at, "%Y-%m-%d") >= "' . date("Y-m-d", strtotime($request->from_date)) . '"');
+        }
+        if (isset($request->end_date)) {
+            $query->whereRaw('DATE_FORMAT(created_at, "%Y-%m-%d") <= "' . date("Y-m-d", strtotime($request->end_date)) . '"');
+        }
+
+    $orderColumn = $columns[$request->order_column] ?? 'id';
+    $orderDir = $request->order_dir ?? 'desc';
+
+    return $query->orderBy($orderColumn, $orderDir);
+    }
+
 
 }

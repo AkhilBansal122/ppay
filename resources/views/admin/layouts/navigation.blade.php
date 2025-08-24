@@ -145,6 +145,14 @@
                         </a>
                     </li>
                 @endcan
+                @can('log')
+                    <li class="nxl-item nxl-hasmenu {{ request()->is('admin.log') ? 'active' : '' }}">
+                        <a href="{{ route('admin.log') }}" class="nxl-link">
+                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                            <span class="nxl-mtext">Log</span>
+                        </a>
+                    </li>
+                @endcan
                      @can('service-charges')
                     <li style="display: none"
                         class="nxl-item nxl-hasmenu nxl-trigger

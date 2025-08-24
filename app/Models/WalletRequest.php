@@ -17,7 +17,7 @@ class WalletRequest extends Model
     public function requestedBy(){
         return $this->belongsTo(User::class, 'requested_user_id');
     }
-        public function fetchData($request, $columns) {
+        public static function fetchData($request, $columns) {
 
     $query = WalletRequest::query()
         ->select(
@@ -34,9 +34,8 @@ class WalletRequest extends Model
         if (isset($request->end_date)) {
             $query->whereRaw('DATE_FORMAT(created_at, "%Y-%m-%d") <= "' . date("Y-m-d", strtotime($request->end_date)) . '"');
         }
-    if (!empty($request['search']['value'])) {
-        $search = $request['search']['value'];
-
+    if (!empty($request['search'])) {
+        $search = $request['search'];
         $query->where(function ($q) use ($search) {
             $q->whereHas('userId', function ($subQuery) use ($search) {
                 $subQuery->where('name', 'like', "%{$search}%");
@@ -44,8 +43,8 @@ class WalletRequest extends Model
             ->orWhereHas('requestedBy', function ($subQuery) use ($search) {
                 $subQuery->where('name', 'like', "%{$search}%");
             })
-            ->orWhere('remark', 'like', "%{$search}%")
-            ->orWhereDate('created_at', 'like', "%{$search}%");
+            ->orWhere('remark', 'like', "%{$search}%");
+
         });
     }
 

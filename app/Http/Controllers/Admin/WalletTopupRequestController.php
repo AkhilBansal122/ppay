@@ -33,9 +33,10 @@ class WalletTopupRequestController extends Controller
             'requested_user_id',
             'amount',
             'remark',
+            'platform_charge',
+            'gst',
             'status',
             'created_at',
-            'updated_at'
 
         ];
 
@@ -158,8 +159,24 @@ class WalletTopupRequestController extends Controller
                         (new CommonController)->removeServiceChargeFromWalletLoad($walletRequest);
                         $response['status'] = true;
                         $response['message'] = 'Request Revert updated successfully';
+
                         $walletRequest->save();
-                         echo json_encode($response);
+                        RequestLog::create([
+                            'status'     => "REVERTED",
+                            'type'       => 'REVERTED',
+                            'user_agent' => $request->header('User-Agent'),
+                            'ip'         => $request->getClientIp(),
+                            'end_point'  => $request->path(),
+                               'data'       => json_encode([
+                            'wallet_request' => $walletRequest->toArray(),
+                            'wallet'         => $wallet ? $wallet->toArray() : null,
+                            'transaction'    => $tx->toArray(),
+                            'service_charge' => ServiceCharge::where("ref_id", $walletRequest->id)->get()->toArray(),
+                             ]),
+                        ]);
+
+
+                        echo json_encode($response);
 
                     }else if($input['status'] == 'APPROVED' && $walletRequest->status == 'PENDING'){
 
@@ -201,6 +218,21 @@ class WalletTopupRequestController extends Controller
                         $walletRequest->save();
                         $response['status'] = true;
                         $response['message'] = 'Request updated successfully';
+                           RequestLog::create([
+                            'status'     => "APPROVED",
+                            'type'       => 'APPROVED',
+                            'user_agent' => $request->header('User-Agent'),
+                            'ip'         => $request->getClientIp(),
+                            'end_point'  => $request->path(),
+                                'data'       => json_encode([
+                            'wallet_request' => $walletRequest->fresh()->toArray(), // latest values
+                            'wallet'         => $wallet ? $wallet->fresh()->toArray() : null,
+                            'transaction'    => $tx->fresh()->toArray(),
+                            'service_charge' => ServiceCharge::where("ref_id", $walletRequest->id)->get()->toArray(),
+                        ]),
+                        ]);
+
+
                         echo json_encode($response);
 
                     }
@@ -212,6 +244,19 @@ class WalletTopupRequestController extends Controller
                         $response['status'] = true;
                         $response['message'] = 'Request updated successfully';
                         $walletRequest->save();
+                         RequestLog::create([
+                        'status'     => "DECLINED",   //
+                        'type'       => "DECLINED",
+                        'user_agent' => $request->header('User-Agent'),
+                        'ip'         => $request->getClientIp(),
+                        'end_point'  => $request->path(),
+                        'data'       => json_encode([
+                            'wallet_request' => $walletRequest->fresh()->toArray(),
+                            'wallet'         => Wallet::where('user_id', $walletRequest->user_id)->first()?->toArray(),
+                            'transaction'    => [],
+                            'service_charge' => [],
+                        ]),
+                    ]);
                         echo json_encode($response);
                     }
                 }
@@ -223,7 +268,7 @@ class WalletTopupRequestController extends Controller
             }
 
         }catch (\Exception $e) {
-            dd($e);
+       //     dd($e);
             DB::rollBack();
             return back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -454,9 +499,11 @@ class WalletTopupRequestController extends Controller
             $data['id'] = $value->id;
             $data['name'] = $value->user_name;
             $data['remark'] = $value->remark;
+            $data['gst'] = $value->gst ?? 0.00;
+            $data['platform_charge'] = $value->platform_charge ?? 0.00;
             $data['requested_by']= $value->requested_by_name;
-				$data['status'] = $value->status;
-                				if($value->status == 'APPROVED'){
+            $data['status'] = $value->status;
+            if($value->status == 'APPROVED'){
 					$data['status'] = '<span class="badge bg-success">APPROVED</span>';
 				}else if ($value->status == 'DECLINED'){
 					$data['status'] = '<span class="badge bg-danger">DECLINED</span>';
@@ -467,9 +514,7 @@ class WalletTopupRequestController extends Controller
                     $data['status'] = '<span class="badge bg-warning">PENDING</span>';
                 }
 
-
             $data['amount'] = $value->amount ?? 'N/A';
-
             $approve ="'APPROVED'";
 				$decline ="'DECLINED'";
                 $revert ="'REVERTED'";
@@ -553,7 +598,7 @@ public function filterData(Request $request)
         }
         // $request->upload_type =2;
         $request->user_id = Auth::user()->id!=1 ? Auth::user()->id :'';
-        $records = Transaction::fetchPayInData($request, $this->columns);
+        $records = WalletRequest::fetchData($request, $this->columns);
         $total = $records->get();
         if (isset($request->start)) {
             $banners = $records->offset($request->start)->limit($request->length)->get();
@@ -566,19 +611,19 @@ protected function exportPDF($records)
 {
     $data = [
         'records' => $records,
-        'title'   => 'PayIn Report',
+        'title'   => 'Wallet Request Report',
         'date'    => now()->format('d-M-Y H:i'),
     ];
 
-    $pdf = Pdf::loadView('exports.payin_pdf', $data)
+    $pdf = Pdf::loadView('exports.wallet_request_pdf', $data)
               ->setPaper('a4', 'landscape'); // or portrait
 
-    return $pdf->download("payin_" . now()->format('Ymd_His') . ".pdf");
+    return $pdf->download("wallet_Request_" . now()->format('Ymd_His') . ".pdf");
 }
 
 protected function exportCSV($records)
 {
-    $filename = "payin_" . now()->format('Ymd_His') . ".csv";
+    $filename = "wallet_request_" . now()->format('Ymd_His') . ".csv";
     $headers = [
         "Content-Type" => "text/csv",
         "Content-Disposition" => "attachment; filename=\"$filename\"",
@@ -587,19 +632,18 @@ protected function exportCSV($records)
     $callback = function() use ($records) {
         $file = fopen('php://output', 'w');
         // Header row
-        fputcsv($file, [ "Sr No",'Transaction ID', 'Type', 'Amount', 'Balance',"Upload Type", 'Status','Description', 'Date']);
+        fputcsv($file, [ "Sr No",'User Name', 'Amounr', 'Remark', 'Platform Charge',"GST", 'Status', 'Date']);
 
         foreach ($records as $key=> $row) {
             fputcsv($file, [
                 $key+1,
-                $row->transaction_id ?? 'N/A',
-                ucfirst($row->type),
-                $row->amount,
-                $row->balance,
-                $row->upload_type == 1 ? 'Single' :"Bulk" ?? 'N/A',
-                ucfirst($row->status),
-                $row->description ??'N/A',
+                $row->user_name ?? 'N/A',
+                number_format($row->amount, 2),
+                $row->remark,
+                number_format($row->platform_charge, 2),
+                number_format($row->gst, 2),
 
+                ucfirst($row->status),
                 dateFormat($row->created_at)
             ]);
         }
