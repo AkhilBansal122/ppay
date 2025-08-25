@@ -274,7 +274,7 @@ class WalletTopupRequestController extends Controller
         }
 }
     private function getComissionNew($getUsers,$user_id,$amount){
-                    $api_status = $getUsers->api_status;
+                    // $api_status = $getUsers->api_status;
                     $charges= 0;
                     $total_charges=0;
 

@@ -10,22 +10,7 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'wallet_id',
-        'type',
-        'amount',
-        'balance',
-        'reference',
-        'description',
-        'transaction_id',
-        'module_type',
-        'order_id',
-        'response_data',
-        'status','upload_type',
-        'remark',
-        'initiator_id'
-    ];
+    protected $guarded =[];
 
 
     public function user()

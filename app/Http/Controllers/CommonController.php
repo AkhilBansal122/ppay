@@ -449,7 +449,7 @@ class CommonController extends Controller
             $serviceCharge->type = 'PAYIN';
             $serviceCharge->ref_id = $wr->id;
             $serviceCharge->ref_type = "WALLET_REQUEST";
-                        $serviceCharge->is_charged  = 1;
+            $serviceCharge->is_charged  = 1;
             // if($wr->source == 'PPAY'){
             //     // $serviceCharge->api_provider = 'EKO';
             // }else{

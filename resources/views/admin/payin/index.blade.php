@@ -85,7 +85,7 @@
                                                 <th>Balance</th>
                                                 <th>Status</th>
                                                 <th>Upload Type</th>
-                                                <th>Description</th>
+                                                {{-- <th>Description</th> --}}
                                                 <th>Date</th>
                                             </tr>
                                         </thead>
@@ -174,10 +174,7 @@
                                     data: 'upload_type',
                                     name: 'upload_type'
                                 },
-                                {
-                                    data: 'description',
-                                    name: 'description'
-                                },
+
                                 {
                                     data: 'created_at',
                                     name: 'created_at'

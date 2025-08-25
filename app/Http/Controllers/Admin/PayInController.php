@@ -111,7 +111,7 @@ class PayInController extends Controller
 
             $data['srno'] = $i++;
             $data['id'] = $value->id;
-            $data['transaction_id'] = $value->transaction_id ?? 'N/A';
+            $data['transaction_id'] = $value->transaction_id ?? $value->id;
               $data['type'] = match($value->type) {
                     'payout' => '<span class="badge bg-danger">Payout</span>',
                     'payin'  => '<span class="badge bg-success">Payin</span>',
@@ -121,7 +121,7 @@ class PayInController extends Controller
                 };
             $data['amount'] = $value->amount ?? 'N/A';
             $data['balance']=$value->balance ?? 'N/A';
-            $data['description']=$value->description ?? 'N/A';
+          //  $data['description']=$value->description ?? 'N/A';
                        $data['status'] = match($value->status) {
                 'success' => '<span class="badge bg-success">Success</span>',
                 'failed'  => '<span class="badge bg-danger">Failed</span>',
