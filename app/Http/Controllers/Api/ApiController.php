@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Models\{User,Transaction,Wallet,Payout,ServiceCharge,Comission};
-
+use App\Models\{User,Transaction,Wallet,Payout,ServiceCharge,Comission,RequestLog};
+use  DB;
 
 use Response;
 class ApiController extends Controller
@@ -39,9 +39,18 @@ class ApiController extends Controller
         // Authenticated user
         $user = Auth::user();
 
+        $api_status = $user->api_status;
+        if($api_status == 0){
+            return response()->json([
+                'status'  => true,
+                'message' => 'API access disabled. Please contact support team.',
+
+            ]);
+        }
+
         // Generate token (requires Laravel Sanctum)
         $token = $user->createToken('APIToken')->plainTextToken;
-
+        unset($user['gst'],$user['admin_id'],$user['api_status'],$user['payout_commission_in_percent'],$user['node_bypass'],$user['status'],$user['email_verified_at']);
         return response()->json([
             'status'  => true,
             'message' => 'Login successful',
@@ -50,18 +59,21 @@ class ApiController extends Controller
         ]);
     }
 
+
+
     public function fetchTXDetail(Request $request)
     {
-
-
-        $txId = $request->id;
+        $txId = $request->transaction_id;
         $user = Auth::user();
 
         if(!empty($txId)){
-            $tx = Transaction::where('id', $txId)
-                ->where('user_id',$user->id)->first();
+            $tx = Transaction::where('transaction_id', $txId)
+                ->where('user_id',$user->id)->orderby("id","desc")->first();
 
             if (!empty($tx)) {
+
+                unset($tx['reference'],$tx['initiator_id'],$tx['order_id'],$tx['response_data'],$tx['wallet_id'],$tx['upload_type'],$tx['user_id'],$tx['is_active']);
+
                 return Response::json([
                     'message' => 'Transaction fetched successfully',
                     'data' => $tx,
@@ -148,7 +160,7 @@ class ApiController extends Controller
         /**
      * Fetch wallet API
      */
-        public function fetchWallet(Request $request)
+    public function fetchWallet(Request $request)
     {
           $user = Auth::user();
 
@@ -167,7 +179,14 @@ class ApiController extends Controller
         }
     }
 
-    public function transfer(Request $request) // API version of single upload for user
+
+
+
+//==================================================================================================
+
+
+
+public function transfer(Request $request) // API version of single upload for user
 {
     $deducted_amount = 0;
 
@@ -193,10 +212,11 @@ class ApiController extends Controller
         'transfer_amount.min' => 'Transfer amount must be at least 1.',
         'payment_mode.required' => 'Payment mode is required.',
     ]);
-    dd($request->all());
+
     DB::beginTransaction();
 
     try {
+
         $user = Auth::user();
         if (!$user) {
             return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
@@ -228,7 +248,8 @@ class ApiController extends Controller
         $wallet_last_balance = (float)$wallet->amount;
         $wallet->decrement('amount', $validated['transfer_amount']);
         $wallet->save();
-                    // ============= Need to uncomment for live txn ================
+
+            // ============= Need to uncomment for live txn ================
             // $transferData = [
             //     'amount'     => $deducted_amount['amount'],
             //     'ifsc'       => $request->ifsc,
@@ -251,6 +272,8 @@ class ApiController extends Controller
             //     'end_point'  => $request->path(),
             //     'data'       => json_encode($transferData),
             // ]);
+
+
         // Simulated API response (replace with live API call)
         $response = '{
             "status": true,
@@ -313,11 +336,19 @@ class ApiController extends Controller
                 'ref_id' => $transaction->id,
                 'ref_type' => "TRANSACTION",
                 'is_charged' => 1,
-                'source' => 'PPAY'
+              //  'source' => 'PPAY'
             ]);
         }
 
+
         DB::commit();
+        unset($transaction['response_data']);
+        unset($transaction['order_id']);
+        unset($transaction['wallet_id']);
+        unset($transaction['upload_type']);
+        unset($transaction['initiator_id']);
+        unset($transaction['user_id']);
+
         return response()->json(['status' => true, 'message' => 'Payout saved successfully!', 'data' => $transaction ?? null]);
 
     } catch (\Exception $e) {

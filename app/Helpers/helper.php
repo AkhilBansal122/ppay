@@ -112,6 +112,7 @@ if (!function_exists('universepay_api')) {
 }
 
 
+
 function sendMail($email, $template, $data)
 {
     try {

@@ -124,7 +124,7 @@ class DashboardController extends Controller
                         ->sum('amount');
 
                     $payIn = Transaction::where('user_id', auth()->id())
-                        ->where('type', 'payin')
+                        ->where('type', 'WALLETLOAD')
                         ->where('status', 'success')
                         ->whereDate('created_at', $today)
                         ->sum('amount');
