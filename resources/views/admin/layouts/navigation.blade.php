@@ -19,7 +19,7 @@
                 </li>
                 <li class="nxl-item nxl-hasmenu {{ request()->is('admin.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('dashboard') }}" class="nxl-link">
-                        <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                        <span class="nxl-micon"><i class="fa fa-home"></i></span>
                         <span class="nxl-mtext">Dashboards</span>
                     </a>
                 </li>
@@ -27,7 +27,7 @@
                 @if (auth()->check() && auth()->user()->id == 1)
                     <li class="nxl-item nxl-hasmenu">
                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                            <span class="nxl-micon"><i class="fa fa-users"></i></span>
                             <span class="nxl-mtext">Role/Permission</span><span class="nxl-arrow"><i
                                     class="feather-chevron-right"></i></span>
                         </a>
@@ -53,7 +53,7 @@
                     <li
                         class="nxl-item nxl-hasmenu nxl-trigger {{ request()->is('singleupload/*') || request()->is('bulkUpload/*') || request()->is('some-route') ? 'active' : '' }}">
                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                            <span class="nxl-micon"><i class="fa fa-upload"></i></span>
                             <span class="nxl-mtext">Uploads</span>
                             <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                         </a>
@@ -80,7 +80,7 @@
                     <li
                         class="nxl-item nxl-hasmenu nxl-trigger {{ request()->is('payin/*') || request()->is('payout/*') || request()->is('some-route') ? 'active' : '' }}">
                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                            <span class="nxl-micon"><i class="fa fa-exchange"></i></span>
                             <span class="nxl-mtext">Transaction</span>
                             <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                         </a>
@@ -113,7 +113,7 @@
                         class="nxl-item nxl-hasmenu nxl-trigger
         {{ request()->is('wallet-topup-request*') || request()->is('wallet-topup*') ? 'active' : '' }}">
                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                            <span class="nxl-micon"><i class="fa fa-briefcase"></i> </span>
                             <span class="nxl-mtext">Wallets</span>
                             <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                         </a>
@@ -140,7 +140,7 @@
                 @can('API-Doc')
                     <li class="nxl-item nxl-hasmenu {{ request()->is('admin.apiDoc') ? 'active' : '' }}">
                         <a href="{{ route('apiDoc') }}" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                            <span class="nxl-micon"><i class="fa fa-history"></i></span>
                             <span class="nxl-mtext">Api Doc</span>
                         </a>
                     </li>

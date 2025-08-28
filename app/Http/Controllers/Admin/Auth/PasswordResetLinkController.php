@@ -59,7 +59,7 @@ class PasswordResetLinkController extends Controller
                 'subject' => 'Forgot password',
                 'route' => 'route',
                 'buttonName' => 'Your Password Reset Link',
-                'message' => 'We have received a password change request for your Evernote account',
+                'message' => 'We have received a password change request for your account.',
                 'url' => route('password.reset', ['token' => $token]),
             ];
 
