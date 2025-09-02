@@ -63,7 +63,9 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="#">PEACEPAY</a>
+            <a class="navbar-brand" href="#">  <img style="width:155px" src="{{ config('custom.public_path') . '/adminAssets/assets/images/logo-full.png' }}" alt=""
+                    class="logo logo-lg" />
+              </a>
             <div class="ms-auto">
                 <a href="{{ route('login') }}" class="btn btn-primary btn-sm">Login</a>
             </div>
