@@ -1,14 +1,19 @@
 <!--! ================================================================ !-->
 <!--! [Start] Navigation Manu !-->
 <!--! ================================================================ !-->
+<style>
+    .iconColor:{
+        color:#5d96fe !important;
+    }
+</style>
 <nav class="nxl-navigation">
     <div class="navbar-wrapper">
         <div class="m-header">
             <a href="index.html" class="b-brand">
                 <!-- ========   change your logo hear   ============ -->
-                <img src="{{ config('custom.public_path') . '/adminAssets/assets/images/logo-full.jpeg' }}" alt=""
+                <img style="width:175px" src="{{ config('custom.public_path') . '/adminAssets/assets/images/logo-full.png' }}" alt=""
                     class="logo logo-lg" />
-                <img src="{{ config('custom.public_path') . '/adminAssets/assets/images/logo-abbr.jpeg' }}" alt=""
+                <img src="{{ config('custom.public_path') . '/adminAssets/assets/images/logo-abbr.png' }}" alt=""
                     class="logo logo-sm" />
             </a>
         </div>
@@ -19,7 +24,7 @@
                 </li>
                 <li class="nxl-item nxl-hasmenu {{ request()->is('admin.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('dashboard') }}" class="nxl-link">
-                        <span class="nxl-micon"><i class="fa fa-home"></i></span>
+                        <span class="nxl-micon"><i class="fa fa-home iconColor" style="color:#5d96fe"></i></span>
                         <span class="nxl-mtext">Dashboards</span>
                     </a>
                 </li>
@@ -27,9 +32,9 @@
                 @if (auth()->check() && auth()->user()->id == 1)
                     <li class="nxl-item nxl-hasmenu">
                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="fa fa-users"></i></span>
+                            <span class="nxl-micon"><i class="fa fa-users iconColor" style="color:#5d96fe"></i></span>
                             <span class="nxl-mtext">Role/Permission</span><span class="nxl-arrow"><i
-                                    class="feather-chevron-right"></i></span>
+                                    class="feather-chevron-right" style="color:#5d96fe"></i></span>
                         </a>
                         <ul class="nxl-submenu"
                             style="display: {{ request()->is('admin.permissions/*') || request()->is('roles/*') ? 'block' : 'none' }};">
@@ -44,7 +49,7 @@
                 @can('Users-Management')
                     <li class="nxl-item nxl-hasmenu {{ request()->is('users/*') ? 'active' : '' }}">
                         <a href="{{ route('users.index') }}" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-users"></i></span>
+                            <span class="nxl-micon"><i class="feather-users iconColor" style="color:#5d96fe"></i></span>
                             <span class="nxl-mtext">Users Management</span>
                         </a>
                     </li>
@@ -53,9 +58,9 @@
                     <li
                         class="nxl-item nxl-hasmenu nxl-trigger {{ request()->is('singleupload/*') || request()->is('bulkUpload/*') || request()->is('some-route') ? 'active' : '' }}">
                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="fa fa-upload"></i></span>
+                            <span class="nxl-micon"><i class="fa fa-upload iconColor" style="color:#5d96fe"></i></span>
                             <span class="nxl-mtext">Uploads</span>
-                            <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            <span class="nxl-arrow"><i class="feather-chevron-right" style="color:#5d96fe"></i></span>
                         </a>
                         <ul class="nxl-submenu"
                             style="display: {{ request()->is('admin/singleupload*') || request()->is('admin/bulkUpload*') ? 'block' : 'none' }};">
@@ -80,9 +85,9 @@
                     <li
                         class="nxl-item nxl-hasmenu nxl-trigger {{ request()->is('payin/*') || request()->is('payout/*') || request()->is('some-route') ? 'active' : '' }}">
                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="fa fa-exchange"></i></span>
+                            <span class="nxl-micon"><i class="fa fa-exchange" style="color:#5d96fe"></i></span>
                             <span class="nxl-mtext">Transaction</span>
-                            <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            <span class="nxl-arrow"><i class="feather-chevron-right" style="color:#5d96fe"></i></span>
                         </a>
                         <ul class="nxl-submenu"
                             style="display: {{ request()->is('admin/payins*') || request()->is('admin/ledgers*') || request()->is('admin/payouts*') ? 'block' : 'none' }};">
@@ -113,9 +118,9 @@
                         class="nxl-item nxl-hasmenu nxl-trigger
         {{ request()->is('wallet-topup-request*') || request()->is('wallet-topup*') ? 'active' : '' }}">
                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="fa fa-briefcase"></i> </span>
+                            <span class="nxl-micon"><i class="fa fa-briefcase" style="color:#5d96fe"></i> </span>
                             <span class="nxl-mtext">Wallets</span>
-                            <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            <span class="nxl-arrow"><i class="feather-chevron-right" style="color:#5d96fe"></i></span>
                         </a>
                         <ul class="nxl-submenu"
                             style="display:
@@ -140,7 +145,7 @@
                 @can('API-Doc')
                     <li class="nxl-item nxl-hasmenu {{ request()->is('admin.apiDoc') ? 'active' : '' }}">
                         <a href="{{ route('apiDoc') }}" class="nxl-link">
-                            <span class="nxl-micon"><i class="fa fa-history"></i></span>
+                            <span class="nxl-micon"><i class="fa fa-history" style="color:#5d96fe"></i></span>
                             <span class="nxl-mtext">Api Doc</span>
                         </a>
                     </li>
@@ -148,7 +153,7 @@
                 @can('log')
                     <li class="nxl-item nxl-hasmenu {{ request()->is('admin.log') ? 'active' : '' }}">
                         <a href="{{ route('admin.log') }}" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                            <span class="nxl-micon"><i class="feather-airplay" style="color:#5d96fe"></i></span>
                             <span class="nxl-mtext">Log</span>
                         </a>
                     </li>
@@ -158,9 +163,9 @@
                         class="nxl-item nxl-hasmenu nxl-trigger
         {{ request()->is('service-charge*') || request()->is('service-charges/*') ? 'active' : '' }}">
                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                            <span class="nxl-micon"><i class="feather-airplay" style="color:#5d96fe"></i></span>
                             <span class="nxl-mtext">Service Charges</span>
-                            <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            <span class="nxl-arrow"><i class="feather-chevron-right" style="color:#5d96fe"></i></span>
                         </a>
                         <ul class="nxl-submenu"
                             style="display:

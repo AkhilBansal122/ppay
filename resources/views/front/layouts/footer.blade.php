@@ -106,7 +106,7 @@
         <div class="footer-bottom">
             <div class="container d-sm-flex align-items-center">
                 <div class="footer-left">
-                    <span class="footer-copyright">© Porto eCommerce. 2021. All Rights Reserved</span>
+                    <span class="footer-copyright">© Porto PeacePay. 2021. All Rights Reserved</span>
                 </div>
 
                 <div class="footer-right ml-auto mt-1 mt-sm-0">

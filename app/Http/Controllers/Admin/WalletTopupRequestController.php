@@ -182,7 +182,7 @@ class WalletTopupRequestController extends Controller
 
                         $walletRequest->is_updated =true;
                         $walletRequest->save();
-                        $walletRequest->utr_no = $input['utr_no'];
+                      //  $walletRequest->utr_no = $input['utr_no'];
                         $walletRequest->status = $input['status'];
                         $datas=$this->getComissionNew($getUsers,$walletRequest->user_id,$walletRequest->amount);
                         $walletRequest->platform_charge =$datas['charges'];//chargs;
@@ -349,7 +349,7 @@ class WalletTopupRequestController extends Controller
 
                     $walletRequest->save();
                      //    dd($walletRequest);
-                    $walletRequest->utr_no = $input['utr_no'];
+                  //  $walletRequest->utr_no = $input['utr_no'];
                     $walletRequest->status = $input['status'];
 
 

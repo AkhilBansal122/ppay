@@ -14,7 +14,7 @@ use App\Models\Wallet;
 use App\Models\RequestLog;
 class WalletTopupController extends Controller
 {
-       public function __construct()
+    public function __construct()
     {
         $this->middleware('permission:wallet-topup-request', ['only' => ['index','show']]); //to access index and show function atleat one of mentioned permission should be assigned
         $this->middleware('permission:wallet-topup', ['only' => ['create','store']]);
@@ -43,17 +43,19 @@ class WalletTopupController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-    'user_id'   => 'required',
-    'amount' => 'required|numeric|min:1',
-    'remark' => 'required|string|max:255',
-], [
-    'user_id.required'   => 'Select User is required.',
-    'amount.required' => 'Amount is required.',
-    'amount.numeric'  => 'Amount must be a number.',
-    'amount.min'      => 'Amount must be at least 1.',
-    'remark.required' => 'Remark is required.',
-    'remark.max'      => 'Remark may not be greater than 255 characters.',
-]);
+            'user_id'   => 'required',
+            'amount' => 'required|numeric|min:1',
+            'utrnumber' => 'required',
+            'remark' => 'required|string|max:255',
+        ], [
+            'user_id.required'   => 'Select User is required.',
+            'amount.required' => 'Amount is required.',
+            'amount.numeric'  => 'Amount must be a number.',
+            'amount.min'      => 'Amount must be at least 1.',
+            'utrnumber.required' => 'UTR number is required.',
+            'remark.required' => 'Remark is required.',
+            'remark.max'      => 'Remark may not be greater than 255 characters.',
+        ]);
 
         $input = $request->all();
         $pin = 8659;
@@ -73,6 +75,7 @@ class WalletTopupController extends Controller
             $wallet->amount = 0;//$input['amount'];
             $wallet->save();
         }
+
         $walletRequest = WalletRequest::where('requested_user_id', Auth::id())
                             ->orderBy('id','desc')
                             ->limit(1)
@@ -87,9 +90,9 @@ class WalletTopupController extends Controller
 
             if($amount == $input['amount'] && $minutes <= 1 ){
 
-                                return redirect()->back()
-        ->withErrors(['amount' => 'llet Request already submitted with this amount!'])
-        ->withInput(); // ✅ This preserves old input values
+                return redirect()->back()
+                ->withErrors(['amount' => 'Wallet Request already submitted with this amount!'])
+                ->withInput(); // This preserves old input values
 
             }
         }
@@ -98,6 +101,7 @@ class WalletTopupController extends Controller
         $walletRequest = new WalletRequest();
         $walletRequest->user_id = $input['user_id'];
         $walletRequest->amount = $input['amount'];
+        $walletRequest->utr_no = $input['utrnumber'];
         $walletRequest->remark = $input['remark'];
         $walletRequest->requested_user_id =  Auth::id();
         $walletRequest->status = 'PENDING';
@@ -106,12 +110,12 @@ class WalletTopupController extends Controller
 
 
         RequestLog::create([
-    'type'       => 'wallet_load_request',
-    'user_agent' => $request->header('User-Agent'),
-    'ip'         => $request->getClientIp(),
-    'end_point'  => $request->path(),
-    'data'       => json_encode($request->all()),
-]);
+            'type'       => 'wallet_load_request',
+            'user_agent' => $request->header('User-Agent'),
+            'ip'         => $request->getClientIp(),
+            'end_point'  => $request->path(),
+            'data'       => json_encode($request->all()),
+        ]);
 
 
         return redirect()->route('wallet-topup-request.index')->with('success', 'Great! Wallet Request has been saved successfully!');

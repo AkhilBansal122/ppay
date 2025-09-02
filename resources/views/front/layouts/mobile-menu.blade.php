@@ -19,7 +19,7 @@
                         <li><a href="category.html">Full Width Banner</a></li>
                         <li><a href="category-banner-boxed-slider.html">Boxed Slider Banner</a></li>
                         <li><a href="category-banner-boxed-image.html">Boxed Image Banner</a></li>
-                        <li><a href="http://www.portotheme.com/html/porto_ecommerce/category-sidebar-left.html">Left
+                        <li><a href="http://www.portotheme.com/html/porto_PeacePay/category-sidebar-left.html">Left
                                 Sidebar</a></li>
                         <li><a href="category-sidebar-right.html">Right Sidebar</a></li>
                         <li><a href="category-off-canvas.html">Off Canvas Filter</a></li>

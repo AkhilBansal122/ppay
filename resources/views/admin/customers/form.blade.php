@@ -58,7 +58,7 @@
      </div>
 @endif
      <!-- Basic Details -->
-     <div class="border rounded p-3 mb-4">
+     {{-- <div class="border rounded p-3 mb-4">
          <h5 class="mb-3">Bank Details</h5>
          <!-- Bank ID -->
          <input type="hidden" name="bank_id" value="{{ $user->bank->id ?? '' }}" />
@@ -82,7 +82,7 @@
                      value="{{ old('bank_mobile', $user->bank->bank_mobile ?? '') }}" class="form-control"
                      pattern="\d{10}" required placeholder="Enter 10 digit Mobile">
              </div>
-     @if(empty($disabled))
+                @if(empty($disabled))
 
              <div class="col-lg-4 mb-3">
                  <label class="form-label">Password
@@ -127,7 +127,8 @@
                      class="form-control" placeholder="Enter Max TPS">
              </div>
          </div>
-     </div>
+     </div> --}}
+
 
      <!-- Payin Commission -->
      <!-- Payin Commission -->

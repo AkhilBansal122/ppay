@@ -2,7 +2,12 @@
 <!--! [Start] Header !-->
 <!--! ================================================================ !-->
 <header class="nxl-header">
-    <div class="header-wrapper">
+    <style>
+        .feather-align-left,.nxl-head-link{
+            color:#fff !important
+        }
+    </style>
+    <div class="header-wrapper" style="background:#5d96fe;!importent;color:white">
         <!--! [Start] Header Left !-->
         <div class="header-left d-flex align-items-center gap-4">
             <!--! [Start] nxl-head-mobile-toggler !-->

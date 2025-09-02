@@ -258,6 +258,8 @@ class SingleUploadController extends Controller
     private function getComissionNew($getUsers, $amount, $type)
     {
         $total_charges = $charges= 0;
+        $gstAmount= 0;
+        $dec_amount=0;
         $user_id  = $getUsers->id;
         $amount = (float)$amount;       // e.g. 1000
         $comission = Comission::where('user_id',$user_id) ->where('type','PAYOUT')->first(); //payout

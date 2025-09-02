@@ -59,13 +59,20 @@
                                 <input type="number" step="0.01" class="form-control" required id="amount" name="amount"
                                     placeholder="Enter amount">
                             </div>
-                            <div class="col-md-3">
+
+                             <div class="col-md-3">
+                                <label for="utrnumber" class="form-label">UTR Number</label>
+                                <input type="text" class="form-control" required id="utrnumber" name="utrnumber"
+                                    placeholder="Enter UTR No.">
+                            </div>
+
+                            <div class="col-md-2">
                                 <label for="remark" class="form-label">Remark</label>
                                 <input type="text" class="form-control" id="remark" name="remark" value="WALLET LOAD" readonly
                                     placeholder="Enter remark">
                             </div>
-                            <div class="col-md-3">
-                                <button type="submit" class="btn btn-primary mt-4 w-100">Request</button>
+                            <div class="col-md-1 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">Request</button>
                             </div>
                             </div>
                         </div>

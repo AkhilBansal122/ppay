@@ -62,17 +62,17 @@ class CustomerController extends Controller
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email',
-                'bank_email' => 'required|email|max:255',
-                'bank_mobile' =>'required|numeric|digits:10',
+              //  'bank_email' => 'required|email|max:255',
+              //  'bank_mobile' =>'required|numeric|digits:10',
                 'phone_no' => 'required|numeric|digits:10', // Ensures only numeric characters are allowed
                 'password' => 'required|string|min:8|confirmed', // 'confirmed' handles password confirmation
                 'password.confirmed' => 'The password confirmation does not match.',
-                'bank_password'=> 'required|string|min:8', // 'confirmed' handles password confirmation
+               // 'bank_password'=> 'required|string|min:8', // 'confirmed' handles password confirmation
                 'role_id' => 'required',
-                'ip_address' => 'required',
-                'max_transfer_amount' => 'required|numeric',
-                'api_provider' => 'required|string',
-                'max_tps' => 'nullable|numeric',
+               // 'ip_address' => 'required',
+               // 'max_transfer_amount' => 'required|numeric',
+              //  'api_provider' => 'required|string',
+               // 'max_tps' => 'nullable|numeric',
                 'payin_commission1' => 'nullable|numeric',
                 'payin_percentage1' => 'nullable|numeric',
                 'payin_commission2' => 'nullable|numeric',
@@ -89,7 +89,7 @@ class CustomerController extends Controller
                 'status' => 'nullable|boolean',
                 'api_status' => 'nullable|boolean',
                 'payout_commission_in_percent' => 'nullable|boolean',
-                'bank_name' => 'required|string|max:255',
+              //  'bank_name' => 'required|string|max:255',
                // 'account_number' => 'required|string|unique:users,account_number',
              //   'ifsc_code' => 'required|string|max:20',
                 'branch_name' => 'nullable|string|max:255',
@@ -126,21 +126,21 @@ class CustomerController extends Controller
            // Assign roles
            $user->assignRole($roles->name);
 
-            updateOrCreateModel(\App\Models\UserBank::class,
-    ['user_id' => $userId],
-    [
-        'admin_id'       => $adminId,
-        'bank_name'      => $request->bank_name,
-        // 'account_number' => $request->account_number,
-       'ip_address'      => $request->ip_address,
-       'api_provider'    => $request->api_provider,
-       'max_transfer_amount' =>$request->max_transfer_amount,
-       'max_tps'=>$request->max_tps,
-        'email'     =>$request->bank_email,
-        'bank_mobile'=>$request->bank_mobile,
-        'password'       => Hash::make($validated['bank_password']),
-    ]
-);
+//             updateOrCreateModel(\App\Models\UserBank::class,
+//     ['user_id' => $userId],
+//     [
+//         'admin_id'       => $adminId,
+//         'bank_name'      => $request->bank_name,
+//         // 'account_number' => $request->account_number,
+//        'ip_address'      => $request->ip_address,
+//        'api_provider'    => $request->api_provider,
+//        'max_transfer_amount' =>$request->max_transfer_amount,
+//        'max_tps'=>$request->max_tps,
+//         'email'     =>$request->bank_email,
+//         'bank_mobile'=>$request->bank_mobile,
+//         'password'       => Hash::make($validated['bank_password']),
+//     ]
+// );
 
 updateOrCreateModel(\App\Models\Comission::class,
     ['user_id' => $userId, 'type' => 'payin'],
@@ -230,14 +230,14 @@ updateOrCreateModel(\App\Models\Comission::class,
                 'email' => 'required|email|unique:users,email,'.$id,
                 'phone_no' => 'required|numeric|digits:10', // Ensures only numeric characters are allowed
                 'role_id' => 'required',
-                  'bank_email' => 'required|email|max:255',
-                'bank_mobile' =>'required|numeric|digits:10',
+             //     'bank_email' => 'required|email|max:255',
+               // 'bank_mobile' =>'required|numeric|digits:10',
                 'phone_no' => 'required|numeric|digits:10', // Ensures only numeric characters are allowed
                 'role_id' => 'required',
-                'ip_address' => 'required',
-                'max_transfer_amount' => 'required|numeric',
-                'api_provider' => 'required|string',
-                'max_tps' => 'nullable|numeric',
+               // 'ip_address' => 'required',
+               // 'max_transfer_amount' => 'required|numeric',
+               // 'api_provider' => 'required|string',
+               // 'max_tps' => 'nullable|numeric',
                 'payin_commission1' => 'nullable|numeric',
                 'payin_percentage1' => 'nullable|numeric',
                 'payin_commission2' => 'nullable|numeric',
@@ -254,10 +254,10 @@ updateOrCreateModel(\App\Models\Comission::class,
                 'status' => 'nullable|boolean',
                 'api_status' => 'nullable|boolean',
                 'payout_commission_in_percent' => 'nullable|boolean',
-                'bank_name' => 'required|string|max:255',
+               // 'bank_name' => 'required|string|max:255',
                // 'account_number' => 'required|string|unique:users,account_number',
              //   'ifsc_code' => 'required|string|max:20',
-                'branch_name' => 'nullable|string|max:255',
+               // 'branch_name' => 'nullable|string|max:255',
 
             ]);
 
@@ -286,27 +286,27 @@ updateOrCreateModel(\App\Models\Comission::class,
 
                 $user->save();
 
-                $data = [
-                    'admin_id'            => $adminId,
-                    'bank_name'           => $request->bank_name,
-                    'ip_address'          => $request->ip_address,
-                    'api_provider'        => $request->api_provider,
-                    'max_transfer_amount' => $request->max_transfer_amount,
-                    'max_tps'             => $request->max_tps,
-                    'email'               => $request->bank_email,
-                    'bank_mobile'         => $request->bank_mobile,
-                ];
+            //     $data = [
+            //         'admin_id'            => $adminId,
+            //         'bank_name'           => $request->bank_name,
+            //         'ip_address'          => $request->ip_address,
+            //         'api_provider'        => $request->api_provider,
+            //         'max_transfer_amount' => $request->max_transfer_amount,
+            //         'max_tps'             => $request->max_tps,
+            //         'email'               => $request->bank_email,
+            //         'bank_mobile'         => $request->bank_mobile,
+            //     ];
 
-                if (!empty($request->bank_password)) {
-                    $data['password'] = Hash::make($request->bank_password);
-                }
+            //     if (!empty($request->bank_password)) {
+            //         $data['password'] = Hash::make($request->bank_password);
+            //     }
 
-               // dd($data);
-                if ($user->bank) {
-                    $user->bank()->update($data);
-                } else {
-                    $user->bank()->create($data); // associate new bank record
-                }
+            //    // dd($data);
+            //     if ($user->bank) {
+            //         $user->bank()->update($data);
+            //     } else {
+            //         $user->bank()->create($data); // associate new bank record
+            //     }
 
 
 
