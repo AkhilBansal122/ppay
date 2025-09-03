@@ -38,6 +38,7 @@
             <div class="main-content">
                 <div class="row">
                     <!-- [Invoices Awaiting Payment] start -->
+                    @if(auth()->user()->id ==1)
                     <div class="col-xxl-4 col-md-4">
                         <div class="card stretch stretch-full">
                             <div class="card-body bg-warning">
@@ -49,7 +50,7 @@
                                         <div>
                                             <div class="fs-4 fw-bold text-white"><span
                                                     class="counter">{{ $universal_balance }}</span></div>
-                                            <h3 class="fs-13 fw-semibold text-truncate-1-line text-white">Wallet Balance
+                                            <h3 class="fs-13 fw-semibold text-truncate-1-line text-white">Universe Pay Wallet Balance
                                             </h3>
                                         </div>
                                     </div>
@@ -58,6 +59,7 @@
 
                         </div>
                     </div>
+                    @endif
 
                     <div class="col-xxl-4 col-md-4">
                         <div class="card stretch stretch-full">
@@ -143,6 +145,48 @@
                     </div>
                     @endif
                     @endauth
+                <div class="col-xxl-4 col-md-4">
+                        <div class="card stretch stretch-full">
+                            <div class="card-body bg-danger">
+                                <div class="d-flex align-items-start justify-content-between mb-4">
+                                    <div class="d-flex gap-4 align-items-center">
+                                        <div class="avatar-text avatar-lg bg-gray-200">
+                                            <span style="color:#5d96fe  ">₹</span>
+                                        </div>
+                                        <div>
+                                            <div class="fs-4 fw-bold text-white"><span
+                                                    class="counter">{{ $wallert_balance }}</span></div>
+                                            <h3 class="fs-13 fw-semibold text-truncate-1-line text-white"> @if(auth()->user()->id ==1) User  @endif  Wallet balance
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+@if(auth()->user()->id ==1)
+                                    <div class="col-xxl-4 col-md-4">
+                        <div class="card stretch stretch-full">
+                            <div class="card-body bg-danger">
+                                <div class="d-flex align-items-start justify-content-between mb-4">
+                                    <div class="d-flex gap-4 align-items-center">
+                                        <div class="avatar-text avatar-lg bg-gray-200">
+                                            <span style="color:#5d96fe  ">₹</span>
+                                        </div>
+                                        <div>
+                                            <div class="fs-4 fw-bold text-white"><span
+                                                    class="counter">{{  $universal_balance-$wallert_balance }}</span></div>
+                                            <h3 class="fs-13 fw-semibold text-truncate-1-line text-white"> Balance Difference (Wallets)
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    @endif
                   </div>
 
                 <div class="row">

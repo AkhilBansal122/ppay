@@ -80,7 +80,8 @@ class DashboardController extends Controller
                 $today = Carbon::today('Asia/Kolkata');
 
                 if (auth()->check() &&  auth()->user()->id == 1) {
-
+                   $wallet =  Wallet::sum('amount');
+   $wallert_balance = $wallet ?? 0.0;
                     $response = universepay_api('/balance', 'POST', []);
                     if (isset($response['status']) && $response['status'] === true) {
                         $universal_balance = isset($response['data']['balance']) ? (float) $response['data']['balance'] : 0.0;
@@ -111,12 +112,14 @@ class DashboardController extends Controller
                         ->whereDate('created_at', $today)
                         ->sum('total_charge');
 
+
+
                 }
 
                 if (auth()->check() &&  auth()->user()->id != 1) {
                    $wallet =  Wallet::where("user_id",auth()->user()->id)->first();
                     $universal_balance = $wallet->amount ?? 0.0;
-
+                    $wallert_balance = $wallet->amount ?? 0.0;
                     $payOut = Transaction::where('user_id', auth()->id())
                         ->where('type', 'payout')
                         ->where('status', 'success')
