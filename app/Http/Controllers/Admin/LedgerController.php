@@ -88,7 +88,7 @@ class LedgerController extends Controller
     }
         public function getData(Request $request)
         {
-        $request->search = $request->search;
+        $request->search = $request->statusValue ?? $request->search;
         if (isset($request->order[0]['column'])) {
             $request->order_column = $request->order[0]['column'];
             $request->order_dir = $request->order[0]['dir'];

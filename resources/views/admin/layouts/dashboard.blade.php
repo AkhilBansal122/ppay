@@ -44,7 +44,7 @@
                                 <div class="d-flex align-items-start justify-content-between mb-4">
                                     <div class="d-flex gap-4 align-items-center">
                                         <div class="avatar-text avatar-lg bg-gray-200">
-                                            <i class="feather-dollar-sign"></i>
+                                           <span style="color:#5d96fe  ">₹</span>
                                         </div>
                                         <div>
                                             <div class="fs-4 fw-bold text-white"><span
@@ -65,7 +65,7 @@
                                 <div class="d-flex align-items-start justify-content-between mb-4">
                                     <div class="d-flex gap-4 align-items-center">
                                         <div class="avatar-text avatar-lg bg-gray-200">
-                                            <i class="feather-dollar-sign"></i>
+                                         <span style="color:#5d96fe  ">₹</span>
                                         </div>
                                         <div>
                                             <div class="fs-4 fw-bold text-white"><span
@@ -85,7 +85,7 @@
                                 <div class="d-flex align-items-start justify-content-between mb-4">
                                     <div class="d-flex gap-4 align-items-center">
                                         <div class="avatar-text avatar-lg bg-gray-200">
-                                            <i class="feather-dollar-sign"></i>
+                                            <span style="color:#5d96fe  ">₹</span>
                                         </div>
                                         <div>
                                             <div class="fs-4 fw-bold text-white"><span
@@ -107,7 +107,7 @@
                                 <div class="d-flex align-items-start justify-content-between mb-4">
                                     <div class="d-flex gap-4 align-items-center">
                                         <div class="avatar-text avatar-lg bg-gray-200">
-                                            <i class="feather-dollar-sign"></i>
+                                            <span style="color:#5d96fe  ">₹</span>
                                         </div>
                                         <div>
                                             <div class="fs-4 fw-bold text-white"><span
@@ -127,7 +127,7 @@
                                 <div class="d-flex align-items-start justify-content-between mb-4">
                                     <div class="d-flex gap-4 align-items-center">
                                         <div class="avatar-text avatar-lg bg-gray-200">
-                                            <i class="feather-dollar-sign"></i>
+                                            <span style="color:#5d96fe  ">₹</span>
                                         </div>
                                         <div>
                                             <div class="fs-4 fw-bold text-white"><span
@@ -148,6 +148,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card stretch stretch-full">
+                            @if(auth()->user()->id ==1)
                             <div class="card-header">
                                 <div class="row align-items-center g-2">
                                     <div class="col-md-3">
@@ -179,7 +180,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                            @endif
                             <div class="card-body p-0">
                                 <div class="table-responsive">
                                     <table class="table table-hover" id="RecentTable"
@@ -240,7 +241,7 @@
                             lengthChange: false,
                             searching: false,
                             order: [
-                                [1, 'desc']
+                                [0, 'desc']
                             ], // 👈 default order (2nd column = transfer_by)
                             columns: [{
                                     data: 'srno',

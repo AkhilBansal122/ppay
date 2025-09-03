@@ -110,6 +110,7 @@
                                                 <th>transfer amount</th>
                                                 <th>payment mode</th>
                                                 <th>remark</th>
+                                                <th>status</th>
                                                 <th>Date</th>
 
                                             </tr>
@@ -192,6 +193,10 @@
                             {
                                 data: 'remark',
                                 name: 'remark'
+                            },
+                            {
+                                data:"status",
+                                name:"status"
                             },
                             {
                                 data: 'created_at',

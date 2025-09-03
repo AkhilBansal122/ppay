@@ -32,6 +32,7 @@ class SingleUploadController extends Controller
             'transfer_amount',
             'payment_mode',
             'remark',
+
             'status',
             'created_at'
         ];
@@ -338,6 +339,9 @@ class SingleUploadController extends Controller
 
         $i = 1;
         foreach ($banners as $value) {
+
+           $getTransation= Transaction::where("reference",$value->id)->first();
+
             $data = [];
 
             $data['srno'] = $i++;
@@ -353,6 +357,13 @@ $data['transfer_amount']=$value->transfer_amount ?? 'N/A';
                         $data['payment_mode']=$value->payment_mode ?? 'N/A';
                         $data['remark'] = $value->remark ?? 'N/A';
 
+
+                                                          $data['status'] = match($getTransation->status) {
+                'success' => '<span class="badge bg-success">Success</span>',
+                'failed'  => '<span class="badge bg-danger">Failed</span>',
+                'pending' => '<span class="badge bg-warning text-dark">Pending</span>',
+                default   => '<span class="badge bg-secondary">N/A</span>',
+            };
 
             $data['created_at'] = dateFormat($value->created_at); // Assuming created_at is a Carbon instance
             $result[] = $data;

@@ -63,11 +63,20 @@
                                         <div class="d-flex justify-content-end gap-2 mt-4">
                                             <button id="filterBtn" class="btn btn-primary">Filter</button>
                                             <button id="resetBtn" class="btn btn-secondary">Reset</button>
-                                                 <select id="exportBtn" class="form-select w-auto">
+                                            <select id="exportBtn" class="form-select w-auto">
                                                 <option value="">Export</option>
                                                 <option value="csv">CSV</option>
                                                 <option value="pdf">PDF</option>
                                             </select>
+                                            @if (auth()->user()->id == 1)
+                                                <select id="StatusBtn" name="StatusBtn" class="form-select w-auto">
+                                                    <option value="">Status</option>
+                                                    <option value="pending">Pending</option>
+                                                    <option value="success">Success </option>
+                                                    <option value="failed">Failed</option>
+
+                                                </select>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -133,6 +142,8 @@
                                 type: 'POST',
                                 data: function(d) {
                                     // Add CSRF token and additional data
+                                    d.statusValue = $('input[name=StatusBtn]').val();
+
                                     d.from_date = $('input[name=from_date]').val();
                                     d.end_date = $('input[name=end_date]').val();
                                     d.search = $('input[name=customSearch]').val();
@@ -235,6 +246,12 @@
 
                             $(this).val(''); // reset select
                         });
+                        $('#StatusBtn').on('change', function(e) {
+                            e.preventDefault();
+                            table.ajax.reload();
+                        });
+
+
 
                     });
                 </script>
